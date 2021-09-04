@@ -16,3 +16,6 @@ const ID = <your group order ID>;
 node uber_eat_api.js
 ```
 
+## TODO
+- [] Error handling
+- [] Reduce Header

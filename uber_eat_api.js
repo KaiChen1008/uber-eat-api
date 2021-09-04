@@ -6,8 +6,8 @@ axios.defaults.withCredentials = true;
 axiosCookieJarSupport(axios);
 const cookieJar = new tough.CookieJar();
 
-
-const ID = '5fad19a9-51b1-4919-8f9b-3f4e1e7f2e41';
+// https://eats.uber.com/group-orders/c9278b82-d972-43c8-9cc8-2b1d54b21c74/join
+const ID = 'c9278b82-d972-43c8-9cc8-2b1d54b21c74';
 
 async function get_cookie(orderID) {
     var baseURL = `https://eats.uber.com/group-orders/${orderID}/join`;
@@ -24,7 +24,7 @@ async function add_member(orderID) {
 
     var data = {
         draftOrderUuid: orderID,
-        nickname: 'watch', // TOD generate random nickanme
+        nickname: 'watch', // TODO generate random nickanme
         creatorEaterUUID: 'c8763685-39c0-4fec-aad7-1674ba12c258'  // TODO: use random function to generate this id
     };
 
@@ -52,7 +52,7 @@ async function add_member(orderID) {
 }
 
 
-async function get_group_order(orderID) {
+async function get_group_order(orderID, full_info) {
     var baseURL = 'https://www.ubereats.com/api/getGroupCartV1';
     var data    = {
         "draftOrderUuid":orderID,
@@ -73,8 +73,12 @@ async function get_group_order(orderID) {
     }
 
     try {
-        return await axios.post(baseURL, data,
-            {headers: headers, jar: cookieJar,});
+        var req = await axios.post(baseURL, data, {headers: headers, jar: cookieJar,});
+
+        if (full_info === true)
+            return req.data.data.groupedItems.map(x => {return {'items':x.items, 'name':x.name}});
+        else
+            return req.data.data.groupedItems.map(x => {return {'items':x.items.map(i => {return {'title':i.title,'price':i.price}}), 'name':x.name}});
     } catch (err){
         return err;
     };
@@ -82,13 +86,16 @@ async function get_group_order(orderID) {
 }
 
 
+function print(items) {
+    for (var i = 0; i < items.length; i++) {
+        console.log( JSON.stringify(items[i]));
+    }
+}
 (async () => {
     var req;
     req = await add_member(ID);
-    req = await get_group_order(ID);
+    req = await get_group_order(ID, false);
+    print(req);
 
-    var items = req.data.data.groupedItems
-    for (var i = 0; i < items.length; i++){
-        console.log(items[i]);
-    }
+    // setInterval(async ()=>{ await get_group_order(ID)}, 1500);
 })();
