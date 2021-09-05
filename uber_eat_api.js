@@ -91,11 +91,17 @@ function print(items) {
         console.log( JSON.stringify(items[i]));
     }
 }
-(async () => {
-    var req;
-    req = await add_member(ID);
-    req = await get_group_order(ID, false);
-    print(req);
 
-    // setInterval(async ()=>{ await get_group_order(ID)}, 1500);
-})();
+module.exports = {
+    add_member: add_member,
+    get_group_order: get_group_order,
+};
+
+// (async () => {
+//     var req;
+//     req = await add_member(ID);
+//     req = await get_group_order(ID, false);
+//     print(req);
+
+//     // setInterval(async ()=>{ await get_group_order(ID)}, 1500);
+// })();
